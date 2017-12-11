@@ -1,4 +1,4 @@
-# LiveSplit.Cuphead
+# LiveSplit.Chronology
 Autosplitter / Load Remover for the game Chronology
 
 ## Installing
