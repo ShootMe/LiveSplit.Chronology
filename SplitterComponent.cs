@@ -73,7 +73,8 @@ namespace LiveSplit.Chronology {
 				shouldSplit = level == Level.Cutscene1 && loading && lastLevel != level;
 			} else if (Model.CurrentState.CurrentPhase == TimerPhase.Running) {
 				if (Model.CurrentState.Run.Count == 1) {
-					shouldSplit = mem.Position().X >= -4535 && !mem.HasControl();
+					PointF pos = mem.Position();
+					shouldSplit = level == Level.Chapter8 && !loading && pos.X >= -4535 && pos.X < -3500 && pos.Y < 1280 && pos.Y > 1260 && !mem.HasControl();
 				} else {
 					switch (currentSplit) {
 						case 0: shouldSplit = level == Level.Cutscene2 && lastLevel != level; break;
@@ -83,7 +84,9 @@ namespace LiveSplit.Chronology {
 						case 4: shouldSplit = level == Level.Cutscene6 && lastLevel != level; break;
 						case 5: shouldSplit = level == Level.Cutscene7 && lastLevel != level; break;
 						case 6: shouldSplit = level == Level.Chapter8 && lastLevel != level; break;
-						case 7: shouldSplit = mem.Position().X >= -4535 && !mem.HasControl(); break;
+						case 7:
+							PointF pos = mem.Position();
+							shouldSplit = level == Level.Chapter8 && !loading && pos.X >= -4535 && pos.X < -3500 && pos.Y < 1280 && pos.Y > 1260 && !mem.HasControl(); break;
 					}
 				}
 			}
