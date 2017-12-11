@@ -1,0 +1,10 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs/LiveSplit.Chronology/v15
+/bin
+/Components/LiveSplit.Chronology.exe
+/obj/Debug
+/obj/Release
+/LiveSplit.Chronology.csproj.user
