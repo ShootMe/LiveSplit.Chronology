@@ -14,29 +14,33 @@ namespace LiveSplit.Chronology {
 
 		public bool IsLoading() {
 			//ChronologyStateManager.globalStateGameInstance.gameSession.isLoading
-			return ChronologyStateManager.Read<bool>(Program, 0x0, 0x24, 0x20);
+			return ChronologyStateManager.Read<bool>(Program, 0x24, 0x20);
 		}
 		public bool HasControl() {
 			//ChronologyStateManager.globalStateGameInstance.gameSession.scene.controller.enabled
-			return ChronologyStateManager.Read<bool>(Program, 0x0, 0x24, 0x24, 0x54, 0x18);
+			return ChronologyStateManager.Read<bool>(Program, 0x24, 0x24, 0x54, 0x18);
 		}
 		public PointF Position() {
 			//ChronologyStateManager.globalStateGameInstance.gameSession.scene.controllable.previousPosition.x/y
-			float x = ChronologyStateManager.Read<float>(Program, 0x0, 0x24, 0x24, 0x58, 0x44, 0x4);
-			float y = ChronologyStateManager.Read<float>(Program, 0x0, 0x24, 0x24, 0x58, 0x44, 0x8);
+			float x = ChronologyStateManager.Read<float>(Program, 0x24, 0x24, 0x58, 0x44, 0x4);
+			float y = ChronologyStateManager.Read<float>(Program, 0x24, 0x24, 0x58, 0x44, 0x8);
 			return new PointF(x, y);
 		}
 		public CharacterState CharacterState() {
 			//ChronologyStateManager.globalStateGameInstance.gameSession.scene.controllable.state
-			return (CharacterState)ChronologyStateManager.Read<int>(Program, 0x0, 0x24, 0x24, 0x58, 0x128);
+			return (CharacterState)ChronologyStateManager.Read<int>(Program, 0x24, 0x24, 0x58, 0x128);
 		}
 		public Level LevelID() {
 			//ChronologyStateManager.globalStateGameInstance.gameSession.levelID
-			return (Level)ChronologyStateManager.Read<int>(Program, 0x0, 0x24, 0x48);
+			Level level = (Level)ChronologyStateManager.Read<int>(Program, 0x24, 0x48);
+			if (level == Level.None) {
+				ChronologyStateManager.Clear();
+			}
+			return level;
 		}
 		public float Progress() {
 			//ChronologyStateManager.globalStateGameInstance.gameSession.progress
-			return ChronologyStateManager.Read<float>(Program, 0x0, 0x24, 0x50);
+			return ChronologyStateManager.Read<float>(Program, 0x24, 0x50);
 		}
 		public bool HookProcess() {
 			if ((Program == null || Program.HasExited) && DateTime.Now > lastHooked.AddSeconds(1)) {
@@ -91,9 +95,12 @@ namespace LiveSplit.Chronology {
 			AutoDeref = autoDeref;
 			this.offsets = offsets;
 			lastID = -1;
-			lastTry = DateTime.MinValue;
 		}
 
+		public void Clear() {
+			Pointer = IntPtr.Zero;
+			lastID = -1;
+		}
 		public T Read<T>(Process program, params int[] offsets) where T : struct {
 			GetPointer(program);
 			return program.Read<T>(Pointer, offsets);
@@ -122,14 +129,15 @@ namespace LiveSplit.Chronology {
 				return Pointer;
 			} else if (program.Id != lastID) {
 				Pointer = IntPtr.Zero;
-				lastID = program.Id;
 			}
 
 			if (Pointer == IntPtr.Zero && DateTime.Now > lastTry.AddSeconds(1)) {
 				lastTry = DateTime.Now;
 
 				Pointer = GetVersionedFunctionPointer(program);
+				lastID = program.Id;
 				if (Pointer != IntPtr.Zero) {
+					Pointer = (IntPtr)program.Read<uint>(Pointer);
 					if (AutoDeref) {
 						Pointer = (IntPtr)program.Read<uint>(Pointer);
 					}

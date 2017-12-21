@@ -1,5 +1,6 @@
 ﻿namespace LiveSplit.Chronology {
 	public enum Level {
+		None = 0,
 		MainMenu = -195935017,
 		Chapter1 = 2090507713,
 		Chapter2 = -443298693,
